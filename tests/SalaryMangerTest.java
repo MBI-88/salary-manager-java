@@ -25,7 +25,7 @@ public class SalaryMangerTest {
 
         for (String key : result.keySet()) {
             if (result.get(key) != tests.get(key)) {
-                System.err.println("Different result");
+                System.err.printf("Output %.2f  expected %.2f\n", result.get(key), tests.get(key));
             }
         }
     }
