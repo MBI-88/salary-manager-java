@@ -19,6 +19,7 @@ class SalaryManager implements ISalaryManager {
           for (String employee : employees) {
                String name = employee.split("=")[0];
                String[] ranges = employee.split("=")[1].split(",");
+               this.ToPay.put(name, 0.0);
 
                for (String r : ranges) {
                     String day = r.substring(0, 2);
@@ -62,8 +63,7 @@ class SalaryManager implements ISalaryManager {
      }
 
      private void Operation(List<Data> payrange, String name, LocalTime start, LocalTime end) {
-          this.ToPay.put(name, 0.0);
-
+     
           for (int i = 0; i < payrange.size(); i++) {
                if (start.compareTo(this.Formater(payrange.get(i).EndRange)) > 0) {
                     continue;
