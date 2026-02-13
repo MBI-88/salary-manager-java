@@ -1,10 +1,9 @@
 package src.salary_manager;
 
-import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
@@ -63,45 +62,46 @@ class SalaryManager implements ISalaryManager {
      }
 
      private void Operation(List<Data> payrange, String name, LocalTime start, LocalTime end) {
-          Double pay = 0.0;
-          this.ToPay.put(name, pay);
+          this.ToPay.put(name, 0.0);
 
           for (int i = 0; i < payrange.size(); i++) {
                if (start.compareTo(this.Formater(payrange.get(i).EndRange)) > 0) {
                     continue;
-               } else if (start.compareTo(this.Formater(payrange.get(i).StartRange)) >= 0
+               } else if (start.compareTo(this.Formater(payrange.get(i).StartRange)) > -1
                          &&
-                         start.compareTo(this.Formater(payrange.get(i).EndRange)) <= 0
+                         start.compareTo(this.Formater(payrange.get(i).EndRange)) < 1
                          &&
-                         end.compareTo(this.Formater(payrange.get(i).EndRange)) <= 0) {
-                    pay += payrange.get(i).Payment * (end.getHour() - start.getHour());
+                         end.compareTo(this.Formater(payrange.get(i).EndRange)) < 1) {
+                    
+                    Double pay = this.ToPay.get(name);
+                    pay += payrange.get(i).Payment * Duration.between(start, end).toHours();
                     this.ToPay.put(name, pay);
 
-               } else if (start.compareTo(this.Formater(payrange.get(i).StartRange)) >= 0
+               } else if (start.compareTo(this.Formater(payrange.get(i).StartRange)) > -1
                          &&
-                         start.compareTo(this.Formater(payrange.get(i).EndRange)) <= 0
+                         start.compareTo(this.Formater(payrange.get(i).EndRange)) < 1
                          &&
                          end.compareTo(this.Formater(payrange.get(i).EndRange)) > 0) {
+
+                    Double pay = this.ToPay.get(name);
                     pay += payrange
-                              .get(i).Payment * (this.Formater(payrange.get(i).EndRange).getHour() - start.getHour());
-                    this.ToPay.put(name, pay);
-
+                              .get(i).Payment * Duration.between(start, this.Formater(payrange.get(i).EndRange))
+                                        .toHours();
+                              
                     for (int t = i+1; t < payrange.size(); t++) {
-                         if (end.compareTo(this.Formater(payrange.get(t).StartRange)) > 0
+                         if (end.compareTo(this.Formater(payrange.get(t).StartRange)) > -1
                                    && end.compareTo(this.Formater(
-                                             payrange.get(t).EndRange)) <= 0) {
-
+                                             payrange.get(t).EndRange)) < 1) {
+                              
+                              
                               pay += payrange.get(t).Payment
-                                        * (end.getHour() - this.Formater(payrange.get(t).StartRange).getHour());
+                                        * Duration.between(this.Formater(payrange.get(t).StartRange), end).toHours();
+                                        
                               this.ToPay.put(name, pay);
 
-                         } else if (end.compareTo(this.Formater(payrange.get(t).StartRange)) > 0
-                                   && end.compareTo(this.Formater(
-                                             payrange.get(t).EndRange)) > 0) {
+                         } else if (end.compareTo(this.Formater(payrange.get(t).EndRange)) > 0) {
 
-                              pay += payrange.get(t).Payment *
-                                        (this.Formater(payrange.get(t).EndRange).getHour()
-                                                  - this.Formater(payrange.get(t).StartRange).getHour());
+                              pay += payrange.get(t).Payment * Duration.between(start, end).toHours();
                               this.ToPay.put(name, pay);
                          }
                     }
