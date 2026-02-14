@@ -26,16 +26,13 @@ class SalaryManager implements ISalaryManager {
                     String[] timeRange = r.split("-");
                     LocalTime start = this.Formater(timeRange[0].substring(2));
                     LocalTime end = this.Formater(timeRange[1]);
-                    List<Data> payrange;
 
                     switch (day) {
                          case "MO", "TU", "WE", "TH", "FR":
-                              payrange = payments.get("Week");
-                              this.Operation(payrange, name, start, end);
+                              this.Operation(payments.get("Week"), name, start, end);
                               break;
                          case "SA", "SU":
-                              payrange = payments.get("Weekend");
-                              this.Operation(payrange, name, start, end);
+                              this.Operation(payments.get("Weekend"), name, start, end);
                               break;
 
                          default:
@@ -74,7 +71,7 @@ class SalaryManager implements ISalaryManager {
                          end.compareTo(this.Formater(payrange.get(i).EndRange)) < 1) {
                     
                     Double pay = this.ToPay.get(name);
-                    pay += payrange.get(i).Payment * Duration.between(start, end).toHours();
+                    pay += payrange.get(i).Payment * (end.getHour() - start.getHour());
                     this.ToPay.put(name, pay);
 
                } else if (start.compareTo(this.Formater(payrange.get(i).StartRange)) > -1
@@ -85,8 +82,8 @@ class SalaryManager implements ISalaryManager {
 
                     Double pay = this.ToPay.get(name);
                     pay += payrange
-                              .get(i).Payment * Duration.between(start, this.Formater(payrange.get(i).EndRange))
-                                        .toHours();
+                              .get(i).Payment * (this.Formater(payrange.get(
+                                        i).EndRange).getHour() - start.getHour());
                               
                     for (int t = i+1; t < payrange.size(); t++) {
                          if (end.compareTo(this.Formater(payrange.get(t).StartRange)) > -1
@@ -95,13 +92,13 @@ class SalaryManager implements ISalaryManager {
                               
                               
                               pay += payrange.get(t).Payment
-                                        * Duration.between(this.Formater(payrange.get(t).StartRange), end).toHours();
+                                        * (end.getHour() - this.Formater(payrange.get(t).StartRange).getHour());
                                         
                               this.ToPay.put(name, pay);
 
                          } else if (end.compareTo(this.Formater(payrange.get(t).EndRange)) > 0) {
 
-                              pay += payrange.get(t).Payment * Duration.between(start, end).toHours();
+                              pay += payrange.get(t).Payment * (end.getHour() - start.getHour());
                               this.ToPay.put(name, pay);
                          }
                     }

@@ -24,9 +24,7 @@ public class SalaryMangerTest {
         Map<String, Double> result = manager.ProcessData(source);
 
         for (String key : result.keySet()) {
-            if (result.get(key) != tests.get(key)) {
-                System.err.printf("Output %.2f  expected %.2f\n", result.get(key), tests.get(key));
-            }
+            assert result.get(key) == tests.get(key);
         }
     }
 }
